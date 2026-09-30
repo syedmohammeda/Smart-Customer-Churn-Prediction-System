@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f5f1">
+  <title>Customer Churn | Prediction Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Churn Signal home">
+      <span class="brand-mark" aria-hidden="true">CS</span>
+      <span>Churn Signal</span>
+    </a>
+    <div class="model-status">
+      <span class="status-dot {% if not model_ready %}status-offline{% endif %}"></span>
+      <span>{% if model_ready %}Model ready{% else %}Model unavailable{% endif %}</span>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div class="eyebrow"><span>RETENTION INTELLIGENCE</span><span class="eyebrow-line"></span></div>
+      <h1 id="page-title">Customer churn<br><span>prediction</span></h1>
+      <p>Estimate churn risk from a customer's service profile and account history.</p>
+    </section>
+
+    {% if error %}
+    <div class="notice" role="alert">{{ error }}</div>
+    {% endif %}
+
+    {% if result %}
+    <section class="result-panel {% if result.prediction == 'Yes' %}result-risk{% else %}result-stable{% endif %}" aria-live="polite">
+      <div class="result-copy">
+        <span class="result-label">PREDICTION</span>
+        <h2>{% if result.prediction == 'Yes' %}Likely to churn{% else %}Not likely to churn{% endif %}</h2>
+        <p>{{ result.message }}</p>
+      </div>
+      <div class="probability">
+        <strong>{{ '%.1f'|format(result.churn_probability * 100) }}<small>%</small></strong>
+        <span>Churn probability</span>
+      </div>
+    </section>
+    {% endif %}
+
+    <form class="prediction-form" action="/" method="post">
+      <fieldset {% if not model_ready %}disabled{% endif %}>
+        <div class="form-heading">
+          <div><span class="section-index">01</span><h2>Customer profile</h2></div>
+          <span class="required-note">All fields required</span>
+        </div>
+
+        <section class="form-section" aria-labelledby="service-heading">
+          <div class="section-title"><h3 id="service-heading">Services &amp; contract</h3><span>01 / 02</span></div>
+          <div class="field-grid">
+            <label>Gender<select name="gender" required><option>Female</option><option>Male</option></select></label>
+            <label>Senior citizen<select name="SeniorCitizen" required><option value="0">No</option><option value="1">Yes</option></select></label>
+            <label>Partner<select name="Partner" required><option>Yes</option><option>No</option></select></label>
+            <label>Dependents<select name="Dependents" required><option>No</option><option>Yes</option></select></label>
+            <label>Phone service<select name="PhoneService" required><option>Yes</option><option>No</option></select></label>
+            <label>Multiple lines<select name="MultipleLines" required><option>No</option><option>Yes</option><option>No phone service</option></select></label>
+            <label>Internet service<select name="InternetService" required><option>DSL</option><option>Fiber optic</option><option>No</option></select></label>
+            <label>Online security<select name="OnlineSecurity" required><option>No</option><option>Yes</option><option>No internet service</option></select></label>
+            <label>Online backup<select name="OnlineBackup" required><option>No</option><option>Yes</option><option>No internet service</option></select></label>
+            <label>Device protection<select name="DeviceProtection" required><option>No</option><option>Yes</option><option>No internet service</option></select></label>
+            <label>Tech support<select name="TechSupport" required><option>No</option><option>Yes</option><option>No internet service</option></select></label>
+            <label>Streaming TV<select name="StreamingTV" required><option>No</option><option>Yes</option><option>No internet service</option></select></label>
+            <label>Streaming movies<select name="StreamingMovies" required><option>No</option><option>Yes</option><option>No internet service</option></select></label>
+            <label>Contract<select name="Contract" required><option>Month-to-month</option><option>One year</option><option>Two year</option></select></label>
+            <label>Paperless billing<select name="PaperlessBilling" required><option>Yes</option><option>No</option></select></label>
+            <label class="field-wide">Payment method<select name="PaymentMethod" required><option>Electronic check</option><option>Mailed check</option><option>Bank transfer (automatic)</option><option>Credit card (automatic)</option></select></label>
+          </div>
+        </section>
+
+        <section class="form-section account-section" aria-labelledby="account-heading">
+          <div class="section-title"><h3 id="account-heading">Account history</h3><span>02 / 02</span></div>
+          <div class="field-grid account-grid">
+            <label>Tenure <span class="field-unit">MONTHS</span><input name="tenure" type="number" min="0" max="100" step="1" value="5" required></label>
+            <label>Monthly charges <span class="field-unit">USD</span><input name="MonthlyCharges" type="number" min="0" step="0.01" value="70.50" required></label>
+            <label class="field-wide">Total charges <span class="field-unit">USD</span><input name="TotalCharges" type="number" min="0" step="0.01" value="350.00" required></label>
+          </div>
+        </section>
+
+        <div class="form-footer">
+          <span>Prediction is an estimate, not a guarantee.</span>
+          <button type="submit"><span>Predict churn</span><span aria-hidden="true">↗</span></button>
+        </div>
+      </fieldset>
+    </form>
+    <footer class="page-footer"><span>Customer retention analysis</span><span>MODEL · LOGISTIC REGRESSION / RANDOM FOREST</span></footer>
+  </main>
+</body>
+</html>
